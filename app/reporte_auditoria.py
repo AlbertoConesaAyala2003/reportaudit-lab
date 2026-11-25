@@ -13,7 +13,6 @@ corregir. No uses este código como ejemplo de cómo hacer las cosas.
 
 import hashlib
 import os
-import re
 import sqlite3
 import subprocess
 
@@ -23,7 +22,6 @@ NOTIFICATION_API_KEY = os.environ.get("REPORTAUDIT_NOTIFICATION_API_KEY", "")
 SMTP_PASSWORD = os.environ.get("REPORTAUDIT_SMTP_PASSWORD", "")
 
 RUTA_DB = os.path.join(os.path.dirname(__file__), "..", "reportes.db")
-NOMBRE_HTML_VALIDO = re.compile(r"[A-Za-z0-9_][A-Za-z0-9_.-]*\.html")
 
 
 def cargar_configuracion(ruta_config):
@@ -45,7 +43,10 @@ def buscar_reportes_cliente(nombre_cliente, ruta_db=RUTA_DB):
 
 def convertir_a_pdf(nombre_archivo):
     """Convierte un reporte HTML a PDF usando la utilidad del sistema."""
-    if not NOMBRE_HTML_VALIDO.fullmatch(nombre_archivo):
+    base = nombre_archivo.removesuffix(".html")
+    if (base == nombre_archivo or not base or not base.isascii()
+            or not (base[0].isalnum() or base[0] == "_")
+            or not all(c.isalnum() or c in "_.-" for c in base)):
         raise ValueError("Nombre de archivo no válido")
     salida = nombre_archivo + ".pdf"
     try:
