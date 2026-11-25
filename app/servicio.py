@@ -9,20 +9,27 @@ Se ejecuta en local con:
 y queda escuchando en http://127.0.0.1:8080
 """
 
+import os
+import secrets
 from pathlib import Path
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, render_template, request
+from flask_wtf.csrf import CSRFProtect
 
 from reporte_auditoria import (
     buscar_reportes_cliente,
     cargar_configuracion,
     convertir_a_pdf,
+    validar_nombre_html,
 )
 
 RUTA_CONFIG = Path(__file__).with_name("config.yaml")
 config = cargar_configuracion(RUTA_CONFIG)
 
 app = Flask(__name__)
+# Una clave compartida permite mantener las sesiones entre procesos de despliegue.
+app.secret_key = os.environ.get("REPORTAUDIT_SECRET_KEY") or secrets.token_bytes(32)
+CSRFProtect(app)
 
 
 @app.get("/")
@@ -48,9 +55,19 @@ def reportes():
 
 
 @app.get("/convertir")
-def convertir():
-    """Convierte a PDF un reporte HTML ya generado en el servidor."""
+def confirmar_conversion():
     archivo = request.args.get("archivo", "")
+    try:
+        validar_nombre_html(archivo)
+    except ValueError:
+        return jsonify(error="Nombre de archivo no válido"), 400
+    return render_template("confirmar_conversion.html", archivo=archivo)
+
+
+@app.post("/convertir")
+def convertir():
+    """Convierte a PDF el reporte confirmado por el usuario."""
+    archivo = request.form.get("archivo", "")
     try:
         salida = convertir_a_pdf(archivo)
     except ValueError:

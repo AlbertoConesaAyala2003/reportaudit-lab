@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<title>Convertir reporte a PDF</title>
+<form method="post" action="{{ url_for('convertir') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="hidden" name="archivo" value="{{ archivo }}">
+  <p>Reporte: <strong>{{ archivo }}</strong></p>
+  <button type="submit">Convertir a PDF</button>
+</form>
+</html>

@@ -41,13 +41,17 @@ def buscar_reportes_cliente(nombre_cliente, ruta_db=RUTA_DB):
         conexion.close()
 
 
-def convertir_a_pdf(nombre_archivo):
-    """Convierte un reporte HTML a PDF usando la utilidad del sistema."""
+def validar_nombre_html(nombre_archivo):
     base = nombre_archivo.removesuffix(".html")
     if (base == nombre_archivo or not base or not base.isascii()
             or not (base[0].isalnum() or base[0] == "_")
             or not all(c.isalnum() or c in "_.-" for c in base)):
         raise ValueError("Nombre de archivo no válido")
+
+
+def convertir_a_pdf(nombre_archivo):
+    """Convierte un reporte HTML a PDF usando la utilidad del sistema."""
+    validar_nombre_html(nombre_archivo)
     salida = nombre_archivo + ".pdf"
     try:
         subprocess.run(["wkhtmltopdf", nombre_archivo, salida], check=False)
