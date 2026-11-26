@@ -1,0 +1,13 @@
+$ git commit -m "test: check that the guard blocks the commit"
+SAST local (Semgrep).....................................................Failed
+- hook id: semgrep
+- exit code: 1
+ • Findings: 3 (3 blocking)
+Ran 187 rules on 1 file: 3 findings.
+    app/reporte_auditoria.py
+   ❯❯❱ python.lang.security.deserialization.avoid-pyyaml-load.avoid-pyyaml-load
+    ❯❱ python.lang.security.insecure-hash-algorithms-md5.insecure-hash-algorithm-md5
+    ❯❱ python.lang.security.audit.md5-used-as-password.md5-used-as-password
+
+$ git log -1 --oneline
+b14241f ci: add Semgrep pre-commit hook
