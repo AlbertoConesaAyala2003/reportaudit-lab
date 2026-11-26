@@ -1,0 +1,4 @@
+# Part O: these two import findings are treated as fictional lab values.
+# Provider validity and revocation are unknown.
+26c1503a528f55138e9b9486603ebd1772302595:app/reporte_auditoria.py:reportaudit-hardcoded-credential:21
+26c1503a528f55138e9b9486603ebd1772302595:app/reporte_auditoria.py:reportaudit-hardcoded-credential:22
