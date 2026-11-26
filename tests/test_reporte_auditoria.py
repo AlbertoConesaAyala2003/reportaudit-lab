@@ -3,7 +3,7 @@ import io
 import sqlite3
 import tempfile
 import unittest
-from contextlib import closing, redirect_stdout
+from contextlib import chdir, closing, redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
 
@@ -30,10 +30,20 @@ class PruebasAuditoria(unittest.TestCase):
     @patch.object(reportes.subprocess, "run")
     def test_argumentos_del_conversor(self, ejecutar):
         for nombre in ("informe.html", "a.b-c_1.html", "_1.html"):
-            with self.subTest(nombre=nombre):
+            with self.subTest(nombre=nombre), tempfile.TemporaryDirectory() as carpeta, chdir(carpeta):
+                Path(nombre).write_text("<p>Reporte</p>", encoding="utf-8")
                 salida = reportes.convertir_a_pdf(nombre)
                 self.assertEqual(salida, nombre + ".pdf")
-                ejecutar.assert_called_with(["wkhtmltopdf", nombre, salida], check=False)
+                ejecutar.assert_called_with(["wkhtmltopdf", "./" + nombre, "./" + salida], check=False)
+
+    @patch.object(reportes.subprocess, "run")
+    def test_solo_convierte_archivos_locales_publicados(self, ejecutar):
+        with tempfile.TemporaryDirectory() as carpeta, chdir(carpeta), redirect_stdout(io.StringIO()):
+            self.assertEqual(reportes.convertir_a_pdf("ausente.html"), "ausente.html.pdf")
+            Path("datos.txt").write_text("prueba", encoding="utf-8")
+            Path("enlace.html").symlink_to("datos.txt")
+            self.assertEqual(reportes.convertir_a_pdf("enlace.html"), "enlace.html.pdf")
+        ejecutar.assert_not_called()
 
     @patch.object(reportes.subprocess, "run")
     def test_rechaza_nombres_invalidos(self, ejecutar):
@@ -46,7 +56,8 @@ class PruebasAuditoria(unittest.TestCase):
     @patch.object(reportes.subprocess, "run", side_effect=FileNotFoundError)
     def test_aviso_sin_conversor(self, _ejecutar):
         salida = io.StringIO()
-        with redirect_stdout(salida):
+        with tempfile.TemporaryDirectory() as carpeta, chdir(carpeta), redirect_stdout(salida):
+            Path("x.html").touch()
             self.assertEqual(reportes.convertir_a_pdf("x.html"), "x.html.pdf")
         self.assertIn("no se generó el PDF", salida.getvalue())
 

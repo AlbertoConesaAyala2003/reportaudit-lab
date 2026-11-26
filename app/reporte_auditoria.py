@@ -53,8 +53,16 @@ def convertir_a_pdf(nombre_archivo):
     """Convierte un reporte HTML a PDF usando la utilidad del sistema."""
     validar_nombre_html(nombre_archivo)
     salida = nombre_archivo + ".pdf"
+    # El formulario selecciona un reporte ya publicado en el directorio local.
+    with os.scandir(".") as archivos:
+        for archivo in archivos:
+            if archivo.name == nombre_archivo and archivo.is_file(follow_symlinks=False):
+                break
+        else:
+            print("Aviso: el reporte HTML no está disponible; no se generó el PDF.")
+            return salida
     try:
-        subprocess.run(["wkhtmltopdf", nombre_archivo, salida], check=False)
+        subprocess.run(["wkhtmltopdf", archivo.path, archivo.path + ".pdf"], check=False)
     except FileNotFoundError:
         print("Aviso: wkhtmltopdf no está instalado; no se generó el PDF.")
     return salida
