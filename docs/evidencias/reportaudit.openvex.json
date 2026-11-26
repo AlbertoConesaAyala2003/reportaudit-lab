@@ -1,0 +1,24 @@
+{
+  "@context": "https://openvex.dev/ns/v0.2.0",
+  "@id": "https://github.com/AlbertoConesaAyala2003/reportaudit-lab/vex/2026-001",
+  "author": "Alberto Conesa",
+  "timestamp": "2026-11-25T15:08:00Z",
+  "version": 1,
+  "statements": [
+    {
+      "vulnerability": {
+        "name": "CVE-2024-34069",
+        "aliases": ["GHSA-2g68-c3qc-8985"]
+      },
+      "products": [
+        {
+          "@id": "pkg:github/AlbertoConesaAyala2003/reportaudit-lab@7156858163f31209375c43698141a41a63e29444",
+          "subcomponents": [{"@id": "pkg:pypi/werkzeug@3.0.1"}]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_in_execute_path",
+      "impact_statement": "En el arranque documentado (python app/servicio.py), app/servicio.py:61-64 llama a app.run con debug=False. El depurador interactivo que requiere CVE-2024-34069 queda desactivado. Reevaluar si el despliegue habilita la depuración o incorpora middleware de depuración."
+    }
+  ]
+}
