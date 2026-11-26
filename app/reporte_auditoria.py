@@ -41,16 +41,28 @@ def buscar_reportes_cliente(nombre_cliente, ruta_db=RUTA_DB):
         conexion.close()
 
 
-def convertir_a_pdf(nombre_archivo):
-    """Convierte un reporte HTML a PDF usando la utilidad del sistema."""
+def validar_nombre_html(nombre_archivo):
     base = nombre_archivo.removesuffix(".html")
     if (base == nombre_archivo or not base or not base.isascii()
             or not (base[0].isalnum() or base[0] == "_")
             or not all(c.isalnum() or c in "_.-" for c in base)):
         raise ValueError("Nombre de archivo no válido")
+
+
+def convertir_a_pdf(nombre_archivo):
+    """Convierte un reporte HTML a PDF usando la utilidad del sistema."""
+    validar_nombre_html(nombre_archivo)
     salida = nombre_archivo + ".pdf"
+    # El formulario selecciona un reporte ya publicado en el directorio local.
+    with os.scandir(".") as archivos:
+        for archivo in archivos:
+            if archivo.name == nombre_archivo and archivo.is_file(follow_symlinks=False):
+                break
+        else:
+            print("Aviso: el reporte HTML no está disponible; no se generó el PDF.")
+            return salida
     try:
-        subprocess.run(["wkhtmltopdf", nombre_archivo, salida], check=False)
+        subprocess.run(["wkhtmltopdf", archivo.path, archivo.path + ".pdf"], check=False)
     except FileNotFoundError:
         print("Aviso: wkhtmltopdf no está instalado; no se generó el PDF.")
     return salida
