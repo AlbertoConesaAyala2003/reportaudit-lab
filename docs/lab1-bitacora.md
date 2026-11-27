@@ -159,13 +159,22 @@ El 26/11/2026 se analizó el contenido confirmado de main en `9554e88`. Se extra
 8. Quitar la cadena del código evita distribuirla en copias nuevas. Quien conserve una copia antigua puede seguir utilizándola mientras sea válida. Hay que revocarla en el proveedor, emitir otra y entregarla al servicio por un canal protegido. La rotación efectiva sigue pendiente de confirmación.
 9. El VEX conserva el aviso y documenta su aplicabilidad a un producto concreto. Para CVE-2024-34069 se justificó que el arranque auditado de ReportAudit desactiva el depurador de Werkzeug. Un cambio en el despliegue obliga a revisar esa conclusión.
 10. El instalador compara la huella SHA-256 del archivo descargado con la publicada para esa versión. Detecta una sustitución si la referencia es fiable. Si se compromete también el canal que publica la referencia, la coincidencia por sí sola no acredita la integridad del proceso de publicación.
-11. Git conserva las versiones anteriores a la retirada de las credenciales. Un análisis del árbol actual y otro del historial cubren contenidos distintos. Revocar las credenciales cierra el riesgo de reutilización. La comparación empírica con Gitleaks corresponde a O.
-12. En G había trece avisos de dependencias. Exigir pip-audit entonces habría bloqueado también correcciones independientes. Tras sanear las versiones en M, el control previsto en P puede impedir que se reintroduzca deuda ya eliminada.
+11. Git conserva las versiones anteriores a la retirada de las credenciales. Un análisis del árbol actual y otro del historial cubren contenidos distintos. Revocar las credenciales cierra el riesgo de reutilización. En O se observaron cero hallazgos en app y dos en el historial con la regla propia antes de aplicar las excepciones.
+12. En G había trece avisos de dependencias. Exigir pip-audit entonces habría bloqueado también correcciones independientes. Tras sanear las versiones en M, el control obligatorio de P detectó el retroceso deliberado de versión en el PR #25.
 13. Dependabot avisa cuando relaciona una versión del repositorio con un aviso conocido. Un control obligatorio de pip-audit evalúa la propuesta antes de fusionarla y puede impedir que llegue a main.
-14. Verificar la atestación vincula el archivo por su huella con una declaración firmada de procedencia del repositorio esperado. Una lista de sumas aislada puede sustituirse junto con el archivo. La procedencia tampoco garantiza que el programa carezca de vulnerabilidades. La prueba del artefacto corresponde a R.
+14. Verificar la atestación vincula el archivo por su huella con una declaración firmada de procedencia del repositorio esperado. Una lista de sumas aislada puede sustituirse junto con el archivo. La procedencia tampoco garantiza que el programa carezca de vulnerabilidades. En R se verificaron las dos atestaciones y se rechazó una copia alterada.
 15. El canal privado permite a los mantenedores evaluar el informe y preparar la corrección antes de divulgar detalles. SECURITY.md indica dónde informar, qué versiones se atienden y qué respuesta esperar.
-16. Maintained mide señales de actividad durante una ventana de tiempo. Un laboratorio reciente puede puntuar bajo por su corta historia. Ese dato debe interpretarse con la antigüedad, la actividad esperada y los demás controles. La puntuación real se medirá en S.
-17. Hasta N existen análisis, revisiones, inventarios y un VEX. La comparación con B5 requiere la respuesta original de la Práctica 2 y el expediente que se elaborará en T.
+16. Maintained mide señales de actividad durante una ventana de tiempo. Un laboratorio reciente puede puntuar bajo por su corta historia. Ese dato debe interpretarse con la antigüedad, la actividad esperada y los demás controles. Scorecard midió 0/10 en Maintained por la antigüedad del repositorio.
+17. En B5 propusimos seis tipos de evidencia. Al contrastarlos con el [expediente de ReportAudit](cra/expediente-evidencias.md), encontramos lo siguiente:
+
+    | Propuesta de B5 | Qué podemos demostrar al terminar el laboratorio |
+    |---|---|
+    | Informes SCA/SAST y decisión sobre explotabilidad | Conservamos los informes de Grype y Trivy, los resultados de Semgrep, CodeQL y SonarQube y un VEX que justifica por qué el aviso del depurador de Werkzeug no afectaba al arranque auditado. |
+    | Pruebas de configuración segura por defecto | El código permite comprobar que se retiraron las credenciales literales y se desactivó el modo de depuración. Las pruebas con unittest cubren, entre otros casos, la protección CSRF. Para acreditar todo lo previsto en B5 faltaría probar sistemáticamente los privilegios efectivos y los servicios activos en una instalación inicial. |
+    | SBOM asociado a cada versión | Para v1.0.0 existe el inventario CycloneDX generado con Syft. Descargamos el SBOM, verificamos su atestación y comprobamos que su contenido coincide con la declaración firmada para el paquete. |
+    | PR de actualización, controles, artefacto firmado y registro del parche | El PR #19 conserva la actualización y su revisión. GitHub Actions registró los controles y la release v1.0.0 incluye sumas SHA-256 y atestaciones Sigstore. En R verificamos el paquete y comprobamos que una copia alterada fallaba. |
+    | Política, informes privados, tiempos de respuesta y avisos | SECURITY.md fija los plazos y el simulacro con Irene dejó un informe, una aceptación y una respuesta fechados en GitHub. Es evidencia de un caso de práctica; para evaluar el cumplimiento habitual de los plazos haría falta una serie de casos reales. |
+    | Inventario y reducción de la superficie de ataque | La guía de B5 proponía inventariar interfaces, puertos y endpoints y comparar su exposición. El expediente recoge correcciones concretas del servicio, pero sigue faltando un inventario de despliegue con mediciones comparables antes y después, como los informes de ZAP o Nmap que propusimos. |
 
 ## Backlog del laboratorio (Issues)
 
@@ -177,10 +186,92 @@ El 26/11/2026 se analizó el contenido confirmado de main en `9554e88`. Se extra
 | [#4](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/issues/4) | Enable Dependabot alerts and security updates | I.1: [PR #17](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/pull/17), commit `ef87b53`, vinculado con `Refs #4`. Solo añade la configuración semanal de pip y GitHub Actions. Pasaron [SonarQube Cloud y CodeQL](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/actions/runs/45599716022). JuanAliaga-dev aprobó el commit `ef87b53` el 25/11/2026 a las 11:01 UTC. Fusionado en `7156858` el 25/11/2026 a las 11:04 UTC. I.2 verificado: grafo de dependencias disponible, alertas activadas, actualizaciones de seguridad activas y agrupación activada. I.3 completado. [Cierre del Issue con la evidencia](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/issues/4#issuecomment-7166082898) el 25/11/2026 a las 14:57 UTC. |
 | #5 | Remediate the findings of the security audit | M.1–M.2 en la rama local `fix/auditoria-seguridad`. Consulta parametrizada, conversión con nombre validado y argumentos separados, carga segura de YAML, PBKDF2-SHA256 con sal aleatoria y credenciales procedentes del entorno. El registro solo indica si la clave está configurada. Rotación en los proveedores pendiente de confirmar. M.3: [PR #20](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/pull/20), commit `719d2ed`, revisión solicitada a JuanAliaga-dev. En la [primera ejecución](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/actions/runs/45644444130) pasaron los trabajos SAST, pero CodeQL señaló `py/polynomial-redos` y SonarQube indicó cobertura nueva del 0 % (mínimo 80 %). La validación alternativa sin expresión regular pasó 12 casos locales y Semgrep. El commit `549d78f` incorporó la corrección y siete pruebas automatizadas. SonarQube midió un 100 % de cobertura del código nuevo (mínimo 80 %) y CodeQL confirmó cero alertas nuevas. Pasaron los [cuatro checks](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/actions/runs/45645667585). JuanAliaga-dev aprobó el commit `549d78f`. El PR se fusionó en `fb34ba4` el 25/11/2026 a las 19:23 UTC y GitHub cerró el Issue #5. |
 | #6 | Upgrade the vulnerable dependencies | [PR #19](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/pull/19) actualizado con main. GitHub muestra la aprobación de Ireneyss y los [cuatro checks en verde](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/actions/runs/45704856679) para `73badd4`. Fusionado en `9e0d0cb` el 25/11/2026 a las 21:37 UTC. GitHub cerró el [Issue #6](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/issues/6). |
-| #7 | Publish the audit log and the before/after evidence | Evidencias de N preparadas para revisión por compañero. |
-| #8 | Detect ReportAudit credentials in the whole Git history | Pendiente del bloque O–T. |
-| #9 | Make SCA and secret scanning required checks on main | Pendiente del bloque O–T. |
-| #10 | Publish a security policy and a private vulnerability reporting channel | Pendiente del bloque O–T. |
-| #11 | Release v1.0.0 with an SBOM and signed provenance | Pendiente del bloque O–T. |
-| #12 | Measure supply-chain maturity with OpenSSF Scorecard | Pendiente del bloque O–T. |
-| #13 | Build the CRA evidence index | Pendiente del bloque O–T. |
+| #7 | Publish the audit log and the before/after evidence | [PR #22](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/pull/22) aprobado por Ireneyss y fusionado en 598357c. |
+| [#8](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/issues/8) | Detect ReportAudit credentials in the whole Git history | Ireneyss aprobó el [PR #23](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/pull/23). Pasaron los cuatro controles. La fusión en `9062e22` cerró el Issue el 26/11/2026. |
+| #9 | Make SCA and secret scanning required checks on main | [Cerrado con la evidencia de P.4](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/issues/9#issuecomment-7192079749). |
+| #10 | Publish a security policy and a private vulnerability reporting channel | [Cerrado el 26/11/2026](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/issues/10#issuecomment-7195196580) tras publicar la política, activar el canal privado y completar ambos turnos del simulacro con Irene. |
+| #11 | Release v1.0.0 with an SBOM and signed provenance | [Cerrado el 26/11/2026 con los resultados de R.3](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/issues/11#issuecomment-7195876248). |
+| #12 | Measure supply-chain maturity with OpenSSF Scorecard | Cerrado al fusionar el [PR #28](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/pull/28), aprobado por Ireneyss. |
+| #13 | Build the CRA evidence index | Expediente preparado para revisión externa. |
+
+---
+
+## Bloque final — Publicar y demostrar (Partes O–T)
+
+### O. Secretos en el historial (Gitleaks)
+
+Gitleaks 8.30.1 instalado en Ubuntu después de comprobar la huella SHA-256 del paquete oficial: `551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb`. Escaneo del 26/11/2026 desde la revisión `598357c`. Se ocultaron los valores en todas las ejecuciones.
+
+| Escaneo | Comando (con `--redact`) | Hallazgos | Origen |
+|---|---|---:|---|
+| Código actual, reglas por defecto | `gitleaks dir app` | 0 | Ninguno |
+| Historial, reglas por defecto | `gitleaks git .` | 1 | `26c1503`, app/reporte_auditoria.py:21 (generic-api-key) |
+| Historial, regla propia y reglas por defecto | `gitleaks git . -c .gitleaks.toml` | 2 | `26c1503`, app/reporte_auditoria.py:21–22 (clave de notificaciones y contraseña SMTP) |
+| Código actual, con regla propia | `gitleaks dir app -c .gitleaks.toml` | 0 | Ninguno |
+| Historial tras registrar las excepciones | `gitleaks git . -c .gitleaks.toml --redact` | 0 | Dos excepciones limitadas al commit de importación |
+
+Las versiones anteriores conservan las asignaciones que la corrección de M retiró del código. La revocación en el proveedor invalida las copias existentes. El [informe redactado](evidencias/gitleaks-historial.json) conserva las referencias a los dos hallazgos.
+
+Por indicación del autor, las dos cadenas se tratan como ficticias a efectos de la práctica. Se desconoce si fueron válidas o si se revocaron en algún proveedor. Tras registrar sus dos huellas, Gitleaks terminó con código 0 en el historial y en el directorio de la aplicación. Una asignación SMTP ficticia en un archivo temporal produjo un hallazgo y código 1.
+
+### P. Puertas obligatorias en main
+
+P.1: se prepararon los trabajos de pip-audit y Gitleaks en la rama `ci/puertas-sca-secretos`. La acción de PyPA v1.1.0 recibe `--disable-pip` mediante su entrada de argumentos adicionales. P.2: el 26/11/2026 GitHub mostró tanto el escaneo de secretos como la protección de los envíos en estado `enabled`. Antes de P.4, la protección de main exige los dos trabajos SAST. La prueba del PR borrador corresponde a P.3.
+
+| Check | ¿Exigido en main? | Resultado en el PR de prueba |
+|---|---|---|
+| SAST - SonarQube Cloud | Sí | Falló al instalar las dependencias antes del análisis. Flask 3.1.3 exige Werkzeug ≥3.1.0. |
+| SAST - CodeQL | Sí | Pasó. |
+| SCA - pip-audit | Sí | Falló con código 1. Ocho identificadores de aviso para Werkzeug 3.0.1. |
+| Secretos - Gitleaks | Sí | Pasó. |
+
+P.4: el 26/11/2026 se verificaron en GitHub los cuatro controles obligatorios de la tabla, una aprobación de un compañero y la exigencia de que la rama esté actualizada antes de fusionarse. La protección de los envíos y el escaneo de secretos estaban activos. Se eliminó la rama de prueba local y remota y se cerró el Issue #9.
+
+Ireneyss aprobó el [PR #24](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/pull/24). Los cuatro trabajos pasaron y la fusión incorporó los controles en `4456fdd`. El [borrador #25](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/pull/25) cambió únicamente Werkzeug de 3.1.9 a 3.0.1 y se cerró sin fusión. El [registro original de pip-audit](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/actions/runs/45819581810/job/139908039520) y su extracto visual incluido en el material local de evaluación recogen los identificadores y sus versiones corregidas. En main se mantuvo Werkzeug 3.1.9.
+
+### Q. Divulgación coordinada (simulacro)
+
+Q.1: Ireneyss aprobó el [PR #26](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/pull/26). Pasaron los seis controles y se verificó la [política publicada en main](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/blob/main/SECURITY.md) tras la fusión en `fa6d63a`. Q.2: el 26/11/2026 se activó el [canal privado de ReportAudit](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/security/advisories/new) y se confirmó mediante la API de GitHub (`enabled: true`).
+
+Q.3, turno como investigador (26/11/2026): AlbertoConesaAyala2003 remitió el informe privado al repositorio de Ireneyss. Irene lo aceptó y respondió en la conversación privada. Se verificó el estado de borrador en GitHub. En la comprobación de ese día, el repositorio de Alberto todavía no había recibido el informe recíproco.
+
+Q.3, turno como responsable: más tarde ese mismo día llegó el informe de Irene. Alberto lo aceptó como borrador y agradeció en inglés la comunicación en el hilo privado. Se comprobó su crédito como informante. El aviso permanece en borrador, sin publicación ni CVE. La captura se guardó localmente para el documento de evidencias.
+
+- Informante: Ireneyss.
+- Identificador del borrador: GHSA-hh77-gff8-wmjr.
+- Severidad: alta, CVSS 3.1 de 7,5. Vector `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N`. La evaluación supone un despliegue accesible por red y considera la posible lectura de reportes de otros clientes. El arranque local usa loopback. No se acreditó modificación o borrado de datos.
+- Debilidad: CWE-89 (inyección SQL). La corrección enlaza el nombre del cliente como parámetro de la consulta.
+- Paquete: `reportaudit` (pip). Versiones afectadas: anteriores a 1.0.0. Versión corregida indicada en el borrador: 1.0.0.
+
+### R. Versión 1.0.0 verificable
+
+| Comprobación | Comando | Resultado |
+|---|---|---|
+| Huellas SHA-256 | `sha256sum -c SHA256SUMS` | Paquete e inventario: OK. |
+| Procedencia SLSA | `gh attestation verify` | Código 0 para el workflow de publicación, la etiqueta v1.0.0 y el commit 211d587. |
+| SBOM atestado | `gh attestation verify --predicate-type https://cyclonedx.org/bom` | Código 0. El inventario descargado coincide con el contenido de la declaración firmada. |
+| Archivo alterado | `gh attestation verify` sobre la copia modificada | Código 1. GitHub no encontró una atestación para la nueva huella. |
+
+Ireneyss aprobó el [PR #27](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/pull/27). La [ejecución de publicación](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/actions/runs/45845814575) generó los cinco archivos de la [release v1.0.0](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/releases/tag/v1.0.0). Se descargaron en un directorio independiente y se verificaron con GitHub CLI 2.106.0. El [resumen de verificación](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/issues/11#issuecomment-7195876248) confirma que se rechazó la copia alterada. Las sumas detectan cambios respecto al manifiesto, la procedencia vincula el paquete con el workflow y el SBOM firmado vincula el inventario con ese paquete. Un workflow de origen comprometido podría firmar un paquete defectuoso y superar estas comprobaciones.
+
+### S. Madurez (OpenSSF Scorecard)
+
+| Check | Puntuación (0–10) | Qué la explica |
+|---|---|---|
+| Puntuación global | 7 | Medición publicada para `e8e0955` el 26/11/2026. Seis controles empatan con la nota mínima. |
+| CII-Best-Practices | 0 | No se detectó participación en el programa de insignias de buenas prácticas de OpenSSF. |
+| Contributors | 0 | Scorecard identificó cero empresas u organizaciones contribuyentes. Esta métrica mide diversidad organizativa. |
+| Fuzzing | 0 | El análisis no encontró pruebas automatizadas de fuzzing. |
+| License | 0 | El análisis no encontró un archivo de licencia en el repositorio. |
+| Maintained | 0 | El repositorio se creó en los últimos 90 días. Su historial aún es corto para evaluar la continuidad del mantenimiento. |
+| Pinned-Dependencies | 0 | Las acciones se referencian con etiquetas, como `actions/checkout@v6`, que pueden apuntar a otro commit con el tiempo. |
+
+La [ejecución en main](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/actions/runs/45847450767) publicó el informe en Code Scanning y en el [visor de OpenSSF](https://scorecard.dev/viewer/?uri=github.com/AlbertoConesaAyala2003/reportaudit-lab). Dos controles quedaron sin puntuación: el token de Scorecard no pudo leer la protección clásica de ramas y Packaging no reconoció el workflow de empaquetado. Signed-Releases obtuvo 8/10 y sí reconoció un artefacto firmado en la única release.
+
+Para elegir una dependencia, Code-Review resulta útil porque indica cuántos cambios tuvieron una segunda revisión: en esta medición fueron 12 de 13 (9/10). Maintained es el más fácil de malinterpretar aquí: su 0 responde a la antigüedad del proyecto y, por sí solo, no demuestra abandono.
+
+**S.3 — Comparación tras fijar las acciones de publicación.** Irene aprobó el [PR #29](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/pull/29), fusionado el 27/11/2026. En la [ejecución de Scorecard sobre `d00bb39`](https://github.com/AlbertoConesaAyala2003/reportaudit-lab/actions/runs/45965406875), Pinned-Dependencies subió de 0 a 1/10 y la puntuación global de 7,0 a 7,1/10. El análisis reconoció las cuatro referencias fijadas en el workflow de publicación: tres usos de acciones de GitHub y uno de terceros. Al evaluar todo el repositorio encontró otras catorce referencias por etiqueta en `cadena-suministro.yml` y `scorecard.yml`, además de una instalación con pip sin hashes.
+
+### T. Expediente de evidencias
+
+El [expediente de v1.0.0](cra/expediente-evidencias.md) recoge doce filas. Se comprobaron diecinueve destinos públicos y el borrador con acceso de colaborador. La revisión externa debe documentarse en el PR final.
