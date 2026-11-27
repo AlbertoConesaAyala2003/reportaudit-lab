@@ -165,7 +165,16 @@ El 26/11/2026 se analizó el contenido confirmado de main en `9554e88`. Se extra
 14. Verificar la atestación vincula el archivo por su huella con una declaración firmada de procedencia del repositorio esperado. Una lista de sumas aislada puede sustituirse junto con el archivo. La procedencia tampoco garantiza que el programa carezca de vulnerabilidades. En R se verificaron las dos atestaciones y se rechazó una copia alterada.
 15. El canal privado permite a los mantenedores evaluar el informe y preparar la corrección antes de divulgar detalles. SECURITY.md indica dónde informar, qué versiones se atienden y qué respuesta esperar.
 16. Maintained mide señales de actividad durante una ventana de tiempo. Un laboratorio reciente puede puntuar bajo por su corta historia. Ese dato debe interpretarse con la antigüedad, la actividad esperada y los demás controles. Scorecard midió 0/10 en Maintained por la antigüedad del repositorio.
-17. De las áreas planteadas en B5, hoy se pueden comprobar los análisis del commit publicado, el SBOM firmado, la actualización de dependencias, la política y el canal de divulgación. Quedan fuera la evaluación formal de riesgos y la documentación técnica completa. Para contrastar estos resultados con las herramientas o pruebas concretas que propusimos falta recuperar nuestra tabla B5 entregada.
+17. En B5 propusimos seis tipos de evidencia. Al contrastarlos con el [expediente de ReportAudit](cra/expediente-evidencias.md), encontramos lo siguiente:
+
+    | Propuesta de B5 | Qué podemos demostrar al terminar el laboratorio |
+    |---|---|
+    | Informes SCA/SAST y decisión sobre explotabilidad | Conservamos los informes de Grype y Trivy, los resultados de Semgrep, CodeQL y SonarQube y un VEX que justifica por qué el aviso del depurador de Werkzeug no afectaba al arranque auditado. |
+    | Pruebas de configuración segura por defecto | El código permite comprobar que se retiraron las credenciales literales y se desactivó el modo de depuración. Las pruebas con unittest cubren, entre otros casos, la protección CSRF. Para acreditar todo lo previsto en B5 faltaría probar sistemáticamente los privilegios efectivos y los servicios activos en una instalación inicial. |
+    | SBOM asociado a cada versión | Para v1.0.0 existe el inventario CycloneDX generado con Syft. Descargamos el SBOM, verificamos su atestación y comprobamos que su contenido coincide con la declaración firmada para el paquete. |
+    | PR de actualización, controles, artefacto firmado y registro del parche | El PR #19 conserva la actualización y su revisión. GitHub Actions registró los controles y la release v1.0.0 incluye sumas SHA-256 y atestaciones Sigstore. En R verificamos el paquete y comprobamos que una copia alterada fallaba. |
+    | Política, informes privados, tiempos de respuesta y avisos | SECURITY.md fija los plazos y el simulacro con Irene dejó un informe, una aceptación y una respuesta fechados en GitHub. Es evidencia de un caso de práctica; para evaluar el cumplimiento habitual de los plazos haría falta una serie de casos reales. |
+    | Inventario y reducción de la superficie de ataque | La guía de B5 proponía inventariar interfaces, puertos y endpoints y comparar su exposición. El expediente recoge correcciones concretas del servicio, pero sigue faltando un inventario de despliegue con mediciones comparables antes y después, como los informes de ZAP o Nmap que propusimos. |
 
 ## Backlog del laboratorio (Issues)
 
